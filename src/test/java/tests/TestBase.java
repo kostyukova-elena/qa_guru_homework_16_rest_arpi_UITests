@@ -13,6 +13,8 @@ public class TestBase {
     public static void setup() {
         Configuration.browserSize = "1920x1080";
         Configuration.pageLoadStrategy = "eager";
+        Configuration.headless = true;
+        Configuration.browser = "chrome";
         Configuration.timeout = 4000;
         Configuration.baseUrl = "https://demoqa.com";
         RestAssured.baseURI = "https://demoqa.com";
