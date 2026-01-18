@@ -47,4 +47,6 @@ tasks.withType(Test).configureEach {
             exceptionFormat "short"
         }
     }
+
+    systemProperties(System.getProperties())
 }
