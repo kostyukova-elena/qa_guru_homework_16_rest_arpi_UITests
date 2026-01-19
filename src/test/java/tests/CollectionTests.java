@@ -20,6 +20,8 @@ public class CollectionTests extends TestBase {
     private final AuthData authData = new AuthData();
     private final BookData bookData = new BookData();
     private final DeleteBookData deleteBookData = new DeleteBookData();
+    private final UIPageObjectsTest uiPageObjectsTest = new UIPageObjectsTest();
+    private Response authResponse;
 
     @Test
     @DisplayName("Добавление книги в корзину и последующее удаление")
@@ -29,7 +31,7 @@ public class CollectionTests extends TestBase {
         deleteBookData.setUserId("602ee7c4-f266-4909-9ad3-97715dce95fe");
         deleteBookData.setIsbn("9781449365035");
 
-        Response authResponse = step("Авторизация", () -> given(bookRequestSpec)
+        authResponse = step("Авторизация", () -> given(bookRequestSpec)
                 .body(authData)
                 .when()
                 .post("/Account/v1/Login")
@@ -61,6 +63,14 @@ public class CollectionTests extends TestBase {
                 .spec(createResponseSpec(201))
                 .extract().response());
 
+        step("Проверка наличия книги в корзине", () -> {
+            uiPageObjectsTest
+                    .openPage()
+                    .cookieAuthorization(authResponse)
+                    .openProfile()
+                    .checkElementIsPresent();
+        });
+
         step("Удаление книги", () -> given(bookRequestSpec)
                 .header("Authorization", "Bearer " + authResponse.path("token"))
                 .body(deleteBookData)
@@ -70,5 +80,12 @@ public class CollectionTests extends TestBase {
                 .log().status()
                 .log().body()
                 .statusCode(204));
+
+        step("Проверка отсутствия книги в корзине", () -> {
+            uiPageObjectsTest
+                    .openPage()
+                    .openProfile()
+                    .checkElementIsMissing();
+        });
     }
 }
